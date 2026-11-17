@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>samimi Gems — دستیارهای شخصی روی وب</title>
+<meta name="description" content="نسخه وب samimi Gems: چند دستیار شخصی با پرامپت دلخواه، با کلید خودت، روی GitHub Pages.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Jost:wght@400;500;600&family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Top bar ===== -->
+  <header class="topbar">
+    <button class="icon-btn menu-btn" id="btnMenu" aria-label="منو">☰</button>
+    <a class="brand" href="#" onclick="return false">
+      <span class="brand-mark">◆</span>
+      <span class="brand-text"><strong>samimi</strong> <span class="brand-light">Gems</span></span>
+      <span class="brand-tag">نسخه وب</span>
+    </a>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" id="btnNewGemTop">＋ جم جدید</button>
+      <button class="btn btn-dark" id="btnSettings">تنظیمات</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ===== Sidebar: gems ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="side-head">
+        <p class="eyebrow">دستیارها — Gems</p>
+        <p class="side-sub">مثل Gemهای جمینای: هر جم یک پرامپت و دانش خودش را دارد.</p>
+      </div>
+      <div class="gems-list" id="gemsList"></div>
+      <button class="btn btn-outline btn-block" id="btnNewGem">＋ ساخت جم جدید</button>
+      <div class="side-foot">
+        <p><span id="gemCount">۰</span> جم · مدل: <code id="modelBadge">—</code></p>
+        <p class="muted">کلید و گفت‌وگوها فقط در مرورگر تو ذخیره می‌شوند؛ به هیچ سروری فرستاده نمی‌شوند.</p>
+        <p class="muted">تم برگرفته از قالب MONVÉL ‏(Framer) — کرم، مشکی و نارنجی سوخته.</p>
+      </div>
+    </aside>
+    <div class="backdrop" id="backdrop"></div>
+
+    <!-- ===== Main: chat ===== -->
+    <main class="main">
+      <div class="key-banner" id="keyBanner" hidden>
+        <div>
+          <strong>هنوز کلید API را وارد نکرده‌ای.</strong>
+          <span>هر کاربر کلید خودش را می‌گذارد؛ بدون کلید، پاسخی نمی‌رسد.</span>
+        </div>
+        <button class="btn btn-dark btn-sm" id="btnKeyBanner">وارد کردن کلید</button>
+      </div>
+
+      <!-- Empty state -->
+      <section class="hero" id="chatEmpty">
+        <p class="eyebrow">Independent · Personal · On the web</p>
+        <h1>دستیارهای شخصی تو،<br>حالا روی وب.</h1>
+        <p class="hero-sub">یک بار پرامپت هر جم را تعریف کن، بعد هر بار باهاش حرف بزن — با کلید خودت، بدون سرور واسط و بدون ثبت‌نام.</p>
+        <ol class="steps">
+          <li><span class="step-num">01</span><div><strong>کلیدت را بگذار</strong><p>از تنظیمات، کلید روتر Nara (یا هر پروایدر OpenAI-compatible) را وارد کن.</p></div></li>
+          <li><span class="step-num">02</span><div><strong>یک جم بساز</strong><p>نام، پرامپت، دانش ضمیمه و کلمات ممنوعه‌اش را مشخص کن.</p></div></li>
+          <li><span class="step-num">03</span><div><strong>چت کن، کپی کن</strong><p>هر پاسخ دکمه کپی و «دوباره بساز» دارد؛ متن پاسخ دست نمی‌خورد.</p></div></li>
+        </ol>
+        <div class="hero-actions">
+          <button class="btn btn-dark" id="btnHeroKey">وارد کردن کلید</button>
+          <button class="btn btn-outline" id="btnHeroGem">ساخت اولین جم</button>
+        </div>
+      </section>
+
+      <!-- Chat view -->
+      <section class="chat" id="chatView" hidden>
+        <div class="chat-head">
+          <div>
+            <h2 id="chatTitle">—</h2>
+            <p class="muted" id="chatSubtitle">—</p>
+          </div>
+          <div class="chat-head-actions">
+            <button class="btn btn-ghost btn-sm" id="btnEditGem">ویرایش جم ✎</button>
+            <button class="btn btn-ghost btn-sm" id="btnResetHistory">پاک کردن حافظه 🧹</button>
+          </div>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="typing" id="typing" hidden><span></span><span></span><span></span> در حال فکر کردن…</div>
+        <form class="composer" id="composerForm">
+          <textarea id="composerInput" rows="1" placeholder="پیامت را اینجا بنویس… (Enter برای ارسال، Shift+Enter برای خط جدید)"></textarea>
+          <button class="btn btn-dark btn-send" type="submit" id="btnSend">ارسال ↑</button>
+        </form>
+        <p class="composer-hint">پاسخ‌ها با مدل <code id="modelHint">—</code> ساخته می‌شوند. کلید تو فقط به پروایدر انتخاب‌شده فرستاده می‌شود.</p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ===== Settings modal ===== -->
+<div class="modal" id="settingsModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-head">
+      <div><p class="eyebrow">01 — اتصال</p><h3 id="settingsTitle">تنظیمات</h3></div>
+      <button class="icon-btn" id="btnCloseSettings" aria-label="بستن">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field-label">کلید API پروایدر <em>(کلید خودت)</em></span>
+      <span class="field-hint">کلید Nara با <code>sk-nry-</code> شروع می‌شود. فقط در localStorage همین مرورگر می‌ماند و جز به پروایدر، به جایی فرستاده نمی‌شود.</span>
+      <span class="input-row">
+        <input type="password" id="setApiKey" placeholder="sk-nry-…" autocomplete="off" dir="ltr" style="text-align:left">
+        <button class="btn btn-ghost btn-sm" type="button" id="toggleKey">نمایش</button>
+      </span>
+    </label>
+
+    <div class="field-grid">
+      <label class="field">
+        <span class="field-label">آدرس پایه (Base URL)</span>
+        <input type="text" id="setBaseUrl" dir="ltr" style="text-align:left">
+        <span class="field-hint">پیش‌فرض Nara است. برای OpenRouter بگذار: <code>https://openrouter.ai/api/v1</code></span>
+      </label>
+      <label class="field">
+        <span class="field-label">مدل</span>
+        <input type="text" id="setModel" list="modelList" dir="ltr" style="text-align:left">
+        <datalist id="modelList"></datalist>
+        <span class="field-hint"><button class="link-btn" type="button" id="btnRefreshModels">↻ بروزرسانی لیست مدل‌های رایگان</button> <span id="modelStatus" class="muted"></span></span>
+      </label>
+    </div>
+
+    <label class="field">
+      <span class="field-label">آدرس پروکسی (اختیاری — فقط اگر خطای CORS گرفتی)</span>
+      <span class="field-hint">روتر Nara از مرورگر مستقیم جواب نمی‌دهد (CORS). اگر خطای اتصال دیدی، پروکسی آماده را در پوشه <code>proxy/</code> همین ریپو روی Cloudflare Workers رایگان دیپلوی کن و آدرسش را اینجا بگذار. راهنما در README است.</span>
+      <input type="text" id="setProxyUrl" placeholder="https://samimi-gems-proxy.<subdomain>.workers.dev" dir="ltr" style="text-align:left">
+    </label>
+
+    <div class="field-grid">
+      <label class="field">
+        <span class="field-label">خلاقیت (Temperature): <output id="tempValue">0.7</output></span>
+        <input type="range" id="setTemperature" min="0" max="1" step="0.1" value="0.7">
+      </label>
+      <label class="field">
+        <span class="field-label">حافظه مکالمه (تعداد پیام)</span>
+        <input type="number" id="setMaxHistory" min="4" max="40" step="2" value="20">
+        <span class="field-hint">مثل ربات تلگرام: پیش‌فرض ۲۰ پیام آخر.</span>
+      </label>
+    </div>
+
+    <label class="check-row"><input type="checkbox" id="chkFallback" checked> اگر مدل اصلی خطا داد، خودکار سراغ مدل‌های رایگان بعدی برو <span class="muted">(مثل ربات)</span></label>
+    <label class="check-row"><input type="checkbox" id="chkStrictBanned"> فیلتر سخت‌گیرانه کلمات ممنوعه: اگر پاسخ شامل کلمه ممنوعه بود، خودکار دوباره بساز <span class="muted">(حداکثر ۲ بار)</span></label>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" id="btnTestConnection">تست اتصال</button>
+      <span id="testStatus" class="muted"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-outline" type="button" id="btnExportData">خروجی (Export)</button>
+      <button class="btn btn-outline" type="button" id="btnImportData">ورودی (Import)</button>
+      <input type="file" id="fileImport" accept=".json,application/json" hidden>
+      <button class="btn btn-dark" type="button" id="btnSaveSettings">ذخیره تنظیمات</button>
+    </div>
+    <p class="danger-zone"><button class="link-btn danger" type="button" id="btnClearAll">حذف همه داده‌ها (کلید، جم‌ها و گفت‌وگوها)</button></p>
+  </div>
+</div>
+
+<!-- ===== Gem editor modal ===== -->
+<div class="modal" id="gemModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="gemModalTitle">
+    <div class="modal-head">
+      <div><p class="eyebrow">02 — جم</p><h3 id="gemModalTitle">جم جدید</h3></div>
+      <button class="icon-btn" id="btnCloseGem" aria-label="بستن">✕</button>
+    </div>
+    <form id="gemForm">
+      <input type="hidden" id="gemId">
+      <label class="field">
+        <span class="field-label">نام جم</span>
+        <input type="text" id="gemName" maxlength="32" placeholder="مثلا: reply guy ✍️ یا مربی زبان" required>
+      </label>
+      <label class="field">
+        <span class="field-label">پرامپت (دستور / System Prompt)</span>
+        <span class="field-hint">شخصیت، لحن، زبان، طول پاسخ و قوانین جم را اینجا بنویس. <span id="instrCount">۰ / ۶۰۰۰</span></span>
+        <textarea id="gemInstruction" rows="8" maxlength="6000" placeholder="مثلا: تو دستیار پاسخ توییتری منی. همیشه به انگلیسی، دوستانه و کوتاه جواب بده…"></textarea>
+      </label>
+      <label class="field">
+        <span class="field-label">دانش ضمیمه <em>(اختیاری)</em></span>
+        <span class="field-hint">متن مرجع جم — مثل فایل .txt / .md در ربات. <span id="knowCount">۰ / ۶۰۰۰</span></span>
+        <textarea id="gemKnowledge" rows="4" maxlength="6000" placeholder="متن دانش را اینجا بچسبان یا فایل آپلود کن…"></textarea>
+        <span class="field-hint"><label class="link-btn" for="fileKnowledge">📎 افزودن فایل .txt / .md به دانش</label><input type="file" id="fileKnowledge" accept=".txt,.md,.markdown" hidden></span>
+      </label>
+      <label class="field">
+        <span class="field-label">کلمات ممنوعه <em>(هر خط یک مورد)</em></span>
+        <span class="field-hint">این کلمات — یا شکل‌های نزدیکشان — هرگز در پاسخ نمی‌آیند؛ هم به پرامپت اضافه می‌شوند، هم بعد از ساخت پاسخ بررسی می‌شوند.</span>
+        <textarea id="gemBanned" rows="4" dir="ltr" style="text-align:left" placeholder="Exactly&#10;game changer&#10;Let's dive in"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button class="btn btn-ghost danger" type="button" id="btnDeleteGem" hidden>حذف این جم 🗑️</button>
+        <span class="spacer"></span>
+        <button class="btn btn-dark" type="submit">ذخیره جم</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<script src="app.js"></script>
+</body>
+</html>
