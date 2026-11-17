@@ -1,0 +1,6 @@
+name = "samimi-gems-proxy"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+NARA_BASE = "https://router.bynara.id/v1"
